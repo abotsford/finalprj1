@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>My map</title>
+
+              <link rel="stylesheet" href="https://unpkg.com/leaflet@1.6.0/dist/leaflet.css"
+        integrity="sha512-xwE/Az9zrjBIphAcBb3F6JVqxf46+CDLwfLMHloNu6KEQCAWi6HcDUbeOfBIptF7tcCzusKFjFw2yuvEpDL9wQ=="
+        crossorigin=""/>
+              <script src="https://unpkg.com/leaflet@1.6.0/dist/leaflet.js"
+        integrity="sha512-gZwIG9x3wUXg2hdXF6+rVkLF/0Vi9U8D2Ntg4Ga5I5BZpVkVxlJWbSQtXPSiUTtC0TjtGOmxa1AJPuV0CPthew=="
+        crossorigin=""></script>
+
+        <style type="text/css">
+          html, body { margin: 0; padding: 0; height: 100%; }
+          #map { min-height: 100%; }
+
+        .title {
+          padding: 6px 8px;
+          font-family: 'Suez One';font-size: 20px;
+          background: white;
+          background: rgba(255,255,255,0.8);
+          box-shadow: 0 0 15px rgba(0,0,0,0.2);
+          border-radius: 5px;
+        }
+
+        </style>
+
+        <script type="text/javascript" src="water75.js"></script>
+        <script type="text/javascript" src="mines.js"></script>
+        <script type="text/javascript" src="mines5mile.js"></script>
+
+    </head>
+
+    <body>
+        <div id="map" style="height: 800px"></div>
+
+          <script type="text/javascript">
+
+          var map = L.map('map', {
+              center: [-25.27, 133.77],
+              zoom: 5
+          });
+
+        var imagery =  L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token={accessToken}', {
+            attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="http://mapbox.com">Mapbox</a>',
+            maxZoom: 15,
+            minZoom: 4,
+            id: 'mapbox.satellite',
+            accessToken: 'pk.eyJ1IjoiYWJvdHNmb3JkMjEiLCJhIjoiY2tlZGZha2FlMDE5ZjJ1anljOWhia2MxMCJ9.DqNRSftCp3gFZezjatqDhg'
+          }).addTo(map);
+
+//ADDING TITLE TO MAP
+          var title = L.control({position: 'topright'}); // position of the title
+title.onAdd = function (map) {
+    this._div = L.DomUtil.create('div', 'title'); // create a div with a class "title"
+    this._div.innerHTML = "<h3>Australia Mining Operations<br> In Relation To Water</h3>";  // Title text, may use html to customize
+    return this._div;
+};
+  title.addTo(map);
+
+//BEGIN WATER SYMBOLOGY
+
+           function style(feature){
+             return {
+               fillColor: 'blue',
+               weight: 0.5,
+               opacity: 1,
+               color: 'blue',
+               fillOpacity: 0.9 };}
+
+      var water = L.geoJson(water, {
+          style:style
+        }).addTo(map);
+
+//BEGIN MINES STYLE AND mouseover
+function highlightFeature(e) {
+    // Get access to the feature that was hovered through e.target
+    var feature = e.target;
+
+    // Set a thick grey border on the feature as mouseover effect
+    // Adjust the values below to change the highlighting styles of features on mouseover
+    // Check out https://leafletjs.com/reference-1.3.4.html#path for more options for changing style
+    feature.setStyle({
+        weight: 3,
+        color: 'white',
+        fillOpacity: 0.7
+    });
+
+    // Bring the highlighted feature to front so that the border doesn’t clash with nearby states
+    // But not for IE, Opera or Edge, since they have problems doing bringToFront on mouseover
+    if (!L.Browser.ie && !L.Browser.opera && !L.Browser.edge) {
+        feature.bringToFront();
+    }}
+    var mines; // define a variable to make the geojson layer accessible for the funtion to use
+
+function resetHighlight(e) {
+    mines.resetStyle(e.target);}
+
+    function onEachFeature(feature, layer) {
+    layer.on({
+        mouseover: highlightFeature, // Do what defined by the highlightFeature function on mouseover
+        mouseout: resetHighlight,    // Do what defined by the resetHighlight function on mouseout
+    });
+}
+
+            var minepointcolor = {
+              radius: 4,
+              fillColor: "#ff0000",
+              color: "#000",
+              weight: 1,
+              opacity: 1,
+              fillOpacity: 0.8
+              };
+
+    var mines = L.geoJson(mines, {
+      onEachFeature: onEachFeature,
+      pointToLayer: function (feature, latlng) {
+				return L.circleMarker(latlng, minepointcolor);}
+      }).bindPopup(function (layer){
+        return layer.feature.properties.NAME
+       + '<p style="color:darkgreen">' + layer.feature.properties.COMMOD_NAM;
+     }).addTo(map);
+
+//Mines 5 miles from water
+function highlightFeature(e) {
+    // Get access to the feature that was hovered through e.target
+    var feature = e.target;
+
+    // Set a thick grey border on the feature as mouseover effect
+    // Adjust the values below to change the highlighting styles of features on mouseover
+    // Check out https://leafletjs.com/reference-1.3.4.html#path for more options for changing style
+    feature.setStyle({
+        weight: 3,
+        color: 'white',
+        fillOpacity: 0.7
+    });
+
+    // Bring the highlighted feature to front so that the border doesn’t clash with nearby states
+    // But not for IE, Opera or Edge, since they have problems doing bringToFront on mouseover
+    if (!L.Browser.ie && !L.Browser.opera && !L.Browser.edge) {
+        feature.bringToFront();
+    }}
+    var mines; // define a variable to make the geojson layer accessible for the funtion to use
+
+function resetHighlight(e) {
+    mine5.resetStyle(e.target);}
+
+    function onEachFeature(feature, layer) {
+    layer.on({
+        mouseover: highlightFeature, // Do what defined by the highlightFeature function on mouseover
+        mouseout: resetHighlight,    // Do what defined by the resetHighlight function on mouseout
+    });
+}
+     var mine5pointcolor = {
+       radius: 4,
+       fillColor: "yellow",
+       color: "#000",
+       weight: 1,
+       opacity: 1,
+       fillOpacity: 0.8
+       };
+
+     var mine5 = L.geoJson(mine5, {
+       onEachFeature: onEachFeature,
+       pointToLayer: function (feature, latlng) {
+ 				return L.circleMarker(latlng, mine5pointcolor);}
+       }).bindPopup(function (layer){
+         return layer.feature.properties.NAME
+        + '<p style="color:darkgreen">' + layer.feature.properties.COMMOD_NAM;
+      }).addTo(map);
+
+
+      //ADDING LAER CONTROLS--- LEGEND GOES BEFORE this
+
+      var basemaps = {
+    "Satellite Imagery": imagery };
+
+      var overlaymaps = {
+    "Operating Mines": mines,
+    "Mines 5mi from water": mine5 };
+
+L.control.layers(basemaps, overlaymaps).addTo(map);
+
+          </script>
+
+    </body>
+</html>
