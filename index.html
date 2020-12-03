@@ -212,11 +212,6 @@ legend.onAdd = function (map) {
 
     // Loop through our the classes and generate a label with a color box for each interval.
     // If you are creating a choropleth map, you DO NOT need to change lines below.
-    for (var i = 0; i < grades.length; i++) {
-        div.innerHTML +=
-        '<i style="background:' + getColor(grades[i] + 1) + '"></i>' +
-        grades[i] + (grades[i + 1] ? '&ndash;' + grades[i + 1] + '<br>' : '+');
-    }
 
     return div;
 };
