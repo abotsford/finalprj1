@@ -13,6 +13,34 @@
         <style type="text/css">
           html, body { margin: 0; padding: 0; height: 100%; }
           #map { min-height: 100%; }
+		
+	 .legend {
+          padding: 6px 8px;
+          line-height: 18px;
+          background: rgba(255,255,255,0.9);
+          box-shadow: 0 0 15px rgba(0,0,0,0.2);
+          border-radius: 5px;
+        }
+		
+		.legend span {
+			position: relative;
+			bottom: 3px;
+		}
+		
+		.legend i {
+          width: 10px;
+          height: 5px;
+          float: left;
+          margin-right: 8px;
+          opacity: 0.7;
+        }
+		
+		.legend .circle {
+			border-radius: 50%;
+			width: 10px;
+			height: 10px;
+			margin-bottom: 8px;
+		}	
 
         .title {
           padding: 6px 8px;
@@ -169,6 +197,19 @@ function resetHighlight(e) {
         + '<p style="color:darkgreen">' + layer.feature.properties.COMMOD_NAM;
       }).addTo(map);
 
+	//ADD LEGEND	  
+		  var opmineslegend = L.control({position: 'bottomright'});
+	  
+	  opmineslegend.onAdd = function (map) {
+		var div = L.DomUtil.create('div', 'legend');
+		div.innerHTML = '<b><h2>Legend</h2></b>';
+		div.innerHTML += '<i class="circle" style="background: #ff0000"></i><span>Operating Mines</span><br>';
+		div.innerHTML += '<i class="circle" style="background: #FFFF00"></i><span>Mines within 5 mi of water</span><br>';
+		div.innerHTML += '<i style="background: #0000FF"></i><span>Water</span>';
+		return div;
+	};
+	
+		opmineslegend.addTo(map);	  
 
       //ADDING LAER CONTROLS--- LEGEND GOES BEFORE this
 
